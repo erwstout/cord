@@ -50,9 +50,9 @@ export default function ChordDiagram({
 
   return (
     <svg
-      viewBox="0 0 110 120"
+      viewBox="-12 0 122 120"
       width={size}
-      height={size * (120 / 110)}
+      height={size * (120 / 122)}
       className="block"
       role="img"
     >
@@ -98,7 +98,7 @@ export default function ChordDiagram({
       {/* fret position label */}
       {!isOpenPosition && (
         <text
-          x={LEFT - 5}
+          x={LEFT - 4}
           y={TOP + FRET_HEIGHT / 2 + 3}
           textAnchor="end"
           fontSize={9}
