@@ -12,11 +12,20 @@ export type ChordShape = {
   barre?: { fret: number; from: number; to: number };
 };
 
+export type Tuning = "standard" | "drop-d";
+
 export type Chord = {
   id: string;
   name: string;
   category: "Major" | "Minor" | "7th" | "Minor 7th" | "Major 7th" | "Sus";
   shape: ChordShape;
+  tuning?: Tuning;
+};
+
+// String labels low → high for each supported tuning.
+export const tuningLabels: Record<Tuning, [string, string, string, string, string, string]> = {
+  standard: ["low E", "A", "D", "G", "B", "high e"],
+  "drop-d": ["low D", "A", "D", "G", "B", "high e"],
 };
 
 export const chords: Chord[] = [
@@ -309,6 +318,105 @@ export const chords: Chord[] = [
     shape: {
       strings: [0, 2, 2, 2, 0, 0],
       fingers: [0, 1, 2, 3, 0, 0],
+    },
+  },
+
+  // Drop D tuning (D A D G B e). The low string is tuned a whole step down,
+  // so D-rooted chords get a low D in the bass and power chords on the bottom
+  // three strings sit on a single fret.
+  {
+    id: "d-major-drop-d",
+    name: "D",
+    category: "Major",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 3, 2],
+      fingers: [0, 0, 0, 1, 3, 2],
+    },
+  },
+  {
+    id: "d-minor-drop-d",
+    name: "Dm",
+    category: "Minor",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 3, 1],
+      fingers: [0, 0, 0, 2, 3, 1],
+    },
+  },
+  {
+    id: "d7-drop-d",
+    name: "D7",
+    category: "7th",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 1, 2],
+      fingers: [0, 0, 0, 2, 1, 3],
+    },
+  },
+  {
+    id: "dmaj7-drop-d",
+    name: "Dmaj7",
+    category: "Major 7th",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 2, 2],
+      fingers: [0, 0, 0, 1, 1, 1],
+    },
+  },
+  {
+    id: "dsus2-drop-d",
+    name: "Dsus2",
+    category: "Sus",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 3, 0],
+      fingers: [0, 0, 0, 1, 2, 0],
+    },
+  },
+  {
+    id: "dsus4-drop-d",
+    name: "Dsus4",
+    category: "Sus",
+    tuning: "drop-d",
+    shape: {
+      strings: [0, 0, 0, 2, 3, 3],
+      fingers: [0, 0, 0, 1, 2, 3],
+    },
+  },
+  {
+    id: "e-minor-drop-d",
+    name: "Em",
+    category: "Minor",
+    tuning: "drop-d",
+    shape: {
+      strings: [2, 2, 2, 0, 0, 0],
+      fingers: [1, 2, 3, 0, 0, 0],
+      barre: { fret: 2, from: 0, to: 2 },
+    },
+  },
+  {
+    id: "g-major-drop-d",
+    name: "G",
+    category: "Major",
+    tuning: "drop-d",
+    shape: {
+      strings: [5, 5, 5, 0, 0, 3],
+      fingers: [1, 1, 1, 0, 0, 2],
+      barre: { fret: 5, from: 0, to: 2 },
+      baseFret: 3,
+    },
+  },
+  {
+    id: "a-major-drop-d",
+    name: "A",
+    category: "Major",
+    tuning: "drop-d",
+    shape: {
+      strings: [7, 7, 7, -1, -1, -1],
+      fingers: [1, 1, 1, 0, 0, 0],
+      barre: { fret: 7, from: 0, to: 2 },
+      baseFret: 5,
     },
   },
 ];
