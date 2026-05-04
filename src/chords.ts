@@ -20,6 +20,7 @@ export type Chord = {
   category: "Major" | "Minor" | "7th" | "Minor 7th" | "Major 7th" | "Sus";
   shape: ChordShape;
   tuning?: Tuning;
+  next?: string[];
 };
 
 // String labels low → high for each supported tuning.
@@ -37,6 +38,7 @@ export const chords: Chord[] = [
       strings: [-1, 3, 2, 0, 1, 0],
       fingers: [0, 3, 2, 0, 1, 0],
     },
+    next: ["g-major", "a-minor", "f-major", "d-minor"],
   },
   {
     id: "d-major",
@@ -46,6 +48,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 3, 2],
       fingers: [0, 0, 0, 1, 3, 2],
     },
+    next: ["g-major", "a-major", "b-minor", "e-minor"],
   },
   {
     id: "e-major",
@@ -55,6 +58,7 @@ export const chords: Chord[] = [
       strings: [0, 2, 2, 1, 0, 0],
       fingers: [0, 2, 3, 1, 0, 0],
     },
+    next: ["a-major", "b-major", "b7", "a-minor"],
   },
   {
     id: "f-major",
@@ -65,6 +69,7 @@ export const chords: Chord[] = [
       fingers: [1, 3, 4, 2, 1, 1],
       barre: { fret: 1, from: 0, to: 5 },
     },
+    next: ["c-major", "g-major", "a-minor", "d-minor"],
   },
   {
     id: "g-major",
@@ -74,6 +79,7 @@ export const chords: Chord[] = [
       strings: [3, 2, 0, 0, 0, 3],
       fingers: [2, 1, 0, 0, 0, 3],
     },
+    next: ["c-major", "d-major", "e-minor", "d7"],
   },
   {
     id: "a-major",
@@ -83,6 +89,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 2, 2, 0],
       fingers: [0, 0, 1, 2, 3, 0],
     },
+    next: ["d-major", "e-major", "b-minor", "e7"],
   },
   {
     id: "b-major",
@@ -93,6 +100,7 @@ export const chords: Chord[] = [
       fingers: [0, 1, 2, 3, 4, 1],
       barre: { fret: 2, from: 1, to: 5 },
     },
+    next: ["e-major", "e-minor", "a-major"],
   },
 
   {
@@ -103,6 +111,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 2, 1, 0],
       fingers: [0, 0, 2, 3, 1, 0],
     },
+    next: ["d-minor", "e7", "f-major", "g-major"],
   },
   {
     id: "d-minor",
@@ -112,6 +121,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 3, 1],
       fingers: [0, 0, 0, 2, 3, 1],
     },
+    next: ["g-major", "a7", "f-major", "c-major"],
   },
   {
     id: "e-minor",
@@ -121,6 +131,7 @@ export const chords: Chord[] = [
       strings: [0, 2, 2, 0, 0, 0],
       fingers: [0, 2, 3, 0, 0, 0],
     },
+    next: ["a-minor", "b7", "c-major", "d-major"],
   },
   {
     id: "f-minor",
@@ -131,6 +142,7 @@ export const chords: Chord[] = [
       fingers: [1, 3, 4, 1, 1, 1],
       barre: { fret: 1, from: 0, to: 5 },
     },
+    next: ["c-major", "c7", "g7"],
   },
   {
     id: "g-minor",
@@ -142,6 +154,7 @@ export const chords: Chord[] = [
       barre: { fret: 3, from: 0, to: 5 },
       baseFret: 3,
     },
+    next: ["d7", "c7", "fmaj7"],
   },
   {
     id: "b-minor",
@@ -153,6 +166,7 @@ export const chords: Chord[] = [
       barre: { fret: 2, from: 1, to: 5 },
       baseFret: 2,
     },
+    next: ["e-minor", "a-major", "d-major", "g-major"],
   },
 
   {
@@ -163,6 +177,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 0, 2, 0],
       fingers: [0, 0, 1, 0, 2, 0],
     },
+    next: ["d-major", "d-minor", "d7"],
   },
   {
     id: "b7",
@@ -172,6 +187,7 @@ export const chords: Chord[] = [
       strings: [-1, 2, 1, 2, 0, 2],
       fingers: [0, 2, 1, 3, 0, 4],
     },
+    next: ["e-major", "e-minor", "a-minor"],
   },
   {
     id: "c7",
@@ -181,6 +197,7 @@ export const chords: Chord[] = [
       strings: [-1, 3, 2, 3, 1, 0],
       fingers: [0, 3, 2, 4, 1, 0],
     },
+    next: ["f-major", "f-minor", "d-minor"],
   },
   {
     id: "d7",
@@ -190,6 +207,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 1, 2],
       fingers: [0, 0, 0, 2, 1, 3],
     },
+    next: ["g-major", "g-minor", "c-major"],
   },
   {
     id: "e7",
@@ -199,6 +217,7 @@ export const chords: Chord[] = [
       strings: [0, 2, 0, 1, 0, 0],
       fingers: [0, 2, 0, 1, 0, 0],
     },
+    next: ["a-major", "a-minor", "d-major"],
   },
   {
     id: "g7",
@@ -208,6 +227,7 @@ export const chords: Chord[] = [
       strings: [3, 2, 0, 0, 0, 1],
       fingers: [3, 2, 0, 0, 0, 1],
     },
+    next: ["c-major", "cmaj7", "f-major"],
   },
 
   {
@@ -218,6 +238,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 0, 1, 0],
       fingers: [0, 0, 2, 0, 1, 0],
     },
+    next: ["dm7", "g7", "cmaj7"],
   },
   {
     id: "dm7",
@@ -227,6 +248,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 1, 1],
       fingers: [0, 0, 0, 2, 1, 1],
     },
+    next: ["g7", "cmaj7", "fmaj7"],
   },
   {
     id: "em7",
@@ -236,6 +258,7 @@ export const chords: Chord[] = [
       strings: [0, 2, 0, 0, 0, 0],
       fingers: [0, 2, 0, 0, 0, 0],
     },
+    next: ["a7", "dmaj7", "am7"],
   },
 
   {
@@ -246,6 +269,7 @@ export const chords: Chord[] = [
       strings: [-1, 3, 2, 0, 0, 0],
       fingers: [0, 3, 2, 0, 0, 0],
     },
+    next: ["dm7", "fmaj7", "am7", "g7"],
   },
   {
     id: "dmaj7",
@@ -255,6 +279,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 2, 2],
       fingers: [0, 0, 0, 1, 1, 1],
     },
+    next: ["em7", "a7", "b-minor", "gmaj7"],
   },
   {
     id: "fmaj7",
@@ -264,6 +289,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 3, 2, 1, 0],
       fingers: [0, 0, 3, 2, 1, 0],
     },
+    next: ["dm7", "g7", "am7", "cmaj7"],
   },
   {
     id: "gmaj7",
@@ -273,6 +299,7 @@ export const chords: Chord[] = [
       strings: [3, 2, 0, 0, 0, 2],
       fingers: [3, 1, 0, 0, 0, 2],
     },
+    next: ["am7", "d7", "em7", "cmaj7"],
   },
 
   {
@@ -283,6 +310,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 2, 0, 0],
       fingers: [0, 0, 1, 2, 0, 0],
     },
+    next: ["a-major", "a-minor", "d-major"],
   },
   {
     id: "asus4",
@@ -292,6 +320,7 @@ export const chords: Chord[] = [
       strings: [-1, 0, 2, 2, 3, 0],
       fingers: [0, 0, 1, 2, 3, 0],
     },
+    next: ["a-major", "d-major", "e-major"],
   },
   {
     id: "dsus2",
@@ -301,6 +330,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 3, 0],
       fingers: [0, 0, 0, 1, 2, 0],
     },
+    next: ["d-major", "d-minor", "g-major"],
   },
   {
     id: "dsus4",
@@ -310,6 +340,7 @@ export const chords: Chord[] = [
       strings: [-1, -1, 0, 2, 3, 3],
       fingers: [0, 0, 0, 1, 2, 3],
     },
+    next: ["d-major", "g-major", "a-major"],
   },
   {
     id: "esus4",
@@ -319,6 +350,7 @@ export const chords: Chord[] = [
       strings: [0, 2, 2, 2, 0, 0],
       fingers: [0, 1, 2, 3, 0, 0],
     },
+    next: ["e-major", "a-major", "b7"],
   },
 
   // Drop D tuning (D A D G B e). The low string is tuned a whole step down,
@@ -333,6 +365,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 3, 2],
       fingers: [0, 0, 0, 1, 3, 2],
     },
+    next: ["g-major-drop-d", "a-major-drop-d", "e-minor-drop-d", "dsus4-drop-d"],
   },
   {
     id: "d-minor-drop-d",
@@ -343,6 +376,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 3, 1],
       fingers: [0, 0, 0, 2, 3, 1],
     },
+    next: ["g-major-drop-d", "a-major-drop-d", "dsus2-drop-d"],
   },
   {
     id: "d7-drop-d",
@@ -353,6 +387,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 1, 2],
       fingers: [0, 0, 0, 2, 1, 3],
     },
+    next: ["g-major-drop-d", "dmaj7-drop-d"],
   },
   {
     id: "dmaj7-drop-d",
@@ -363,6 +398,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 2, 2],
       fingers: [0, 0, 0, 1, 1, 1],
     },
+    next: ["e-minor-drop-d", "a-major-drop-d", "g-major-drop-d"],
   },
   {
     id: "dsus2-drop-d",
@@ -373,6 +409,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 3, 0],
       fingers: [0, 0, 0, 1, 2, 0],
     },
+    next: ["d-major-drop-d", "d-minor-drop-d", "a-major-drop-d"],
   },
   {
     id: "dsus4-drop-d",
@@ -383,6 +420,7 @@ export const chords: Chord[] = [
       strings: [0, 0, 0, 2, 3, 3],
       fingers: [0, 0, 0, 1, 2, 3],
     },
+    next: ["d-major-drop-d", "g-major-drop-d", "a-major-drop-d"],
   },
   {
     id: "e-minor-drop-d",
@@ -394,6 +432,7 @@ export const chords: Chord[] = [
       fingers: [1, 2, 3, 0, 0, 0],
       barre: { fret: 2, from: 0, to: 2 },
     },
+    next: ["d-major-drop-d", "a-major-drop-d", "g-major-drop-d"],
   },
   {
     id: "g-major-drop-d",
@@ -406,6 +445,7 @@ export const chords: Chord[] = [
       barre: { fret: 5, from: 0, to: 2 },
       baseFret: 3,
     },
+    next: ["d-major-drop-d", "a-major-drop-d", "e-minor-drop-d"],
   },
   {
     id: "a-major-drop-d",
@@ -418,5 +458,6 @@ export const chords: Chord[] = [
       barre: { fret: 7, from: 0, to: 2 },
       baseFret: 5,
     },
+    next: ["d-major-drop-d", "d-minor-drop-d", "g-major-drop-d"],
   },
 ];
