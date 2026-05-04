@@ -1,0 +1,151 @@
+import { useMemo, useState } from "react";
+import { chords, type Chord } from "./chords";
+import ChordDiagram from "./ChordDiagram";
+
+const categories: Chord["category"][] = [
+  "Major",
+  "Minor",
+  "7th",
+  "Minor 7th",
+  "Major 7th",
+  "Sus",
+];
+
+export default function App() {
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<
+    Chord["category"] | "All"
+  >("All");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return chords.filter((c) => {
+      if (activeCategory !== "All" && c.category !== activeCategory)
+        return false;
+      if (!q) return true;
+      return (
+        c.name.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q)
+      );
+    });
+  }, [query, activeCategory]);
+
+  const selected = selectedId
+    ? chords.find((c) => c.id === selectedId) ?? null
+    : null;
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <header className="border-b border-white/15">
+        <div className="mx-auto max-w-5xl px-6 py-6 flex items-baseline justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight font-mono">
+            cord
+          </h1>
+          <p className="text-xs text-white/50 font-mono">guitar chords</p>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-5xl px-6 py-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="search chords…"
+            className="w-full sm:max-w-sm bg-black border border-white/30 focus:border-white px-3 py-2 text-sm font-mono outline-none placeholder:text-white/40"
+          />
+          <div className="flex flex-wrap gap-1.5">
+            {(["All", ...categories] as const).map((c) => {
+              const active = activeCategory === c;
+              return (
+                <button
+                  key={c}
+                  onClick={() => setActiveCategory(c)}
+                  className={
+                    "px-2.5 py-1 text-xs font-mono border " +
+                    (active
+                      ? "bg-white text-black border-white"
+                      : "border-white/30 text-white/70 hover:border-white hover:text-white")
+                  }
+                >
+                  {c}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <section className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {filtered.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => setSelectedId(c.id)}
+              className="group border border-white/20 hover:border-white p-3 flex flex-col items-center gap-2 transition-colors"
+            >
+              <ChordDiagram shape={c.shape} size={120} showFingers={false} />
+              <div className="flex w-full items-baseline justify-between">
+                <span className="font-mono text-sm">{c.name}</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-white/40">
+                  {c.category}
+                </span>
+              </div>
+            </button>
+          ))}
+          {filtered.length === 0 && (
+            <p className="col-span-full text-center text-white/50 font-mono text-sm py-12">
+              no chords match.
+            </p>
+          )}
+        </section>
+      </main>
+
+      {selected && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+          onClick={() => setSelectedId(null)}
+        >
+          <div
+            className="border border-white/30 bg-black p-6 sm:p-8 max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-baseline justify-between mb-6">
+              <div>
+                <h2 className="text-3xl font-mono">{selected.name}</h2>
+                <p className="text-xs font-mono text-white/50 uppercase tracking-wider mt-1">
+                  {selected.category}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedId(null)}
+                aria-label="Close"
+                className="font-mono text-white/60 hover:text-white text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="flex justify-center">
+              <ChordDiagram shape={selected.shape} size={280} />
+            </div>
+
+            <div className="mt-6 flex justify-between gap-2 text-xs font-mono text-white/60">
+              <span>low E</span>
+              <span>A</span>
+              <span>D</span>
+              <span>G</span>
+              <span>B</span>
+              <span>high e</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <footer className="mx-auto max-w-5xl px-6 py-10 text-center text-xs font-mono text-white/40">
+        <p>{chords.length} chords · open and barre shapes</p>
+      </footer>
+    </div>
+  );
+}
