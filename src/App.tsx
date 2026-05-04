@@ -166,6 +166,34 @@ export default function App() {
                 tuning: D A D G B e
               </p>
             )}
+
+            {(() => {
+              const suggestions = (selected.next ?? [])
+                .map((id) => chords.find((c) => c.id === id))
+                .filter((c): c is Chord => Boolean(c));
+              if (suggestions.length === 0) return null;
+              return (
+                <div className="mt-8 pt-6 border-t border-white/15">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-white/40 mb-3">
+                    next
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedId(s.id)}
+                        className="px-2.5 py-1 text-xs font-mono border border-white/20 hover:border-white text-white/80 hover:text-white transition-colors"
+                      >
+                        {s.name}
+                        {s.tuning === "drop-d" && (
+                          <span className="ml-1.5 text-white/40">· Drop D</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
