@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { chords, tuningLabels, type Chord } from "./chords";
 import ChordDiagram from "./ChordDiagram";
+import Songs from "./Songs";
 
 const categories: Chord["category"][] = [
   "Major",
@@ -11,7 +12,10 @@ const categories: Chord["category"][] = [
   "Sus",
 ];
 
+type Tab = "chords" | "songs";
+
 export default function App() {
+  const [tab, setTab] = useState<Tab>("chords");
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<
     Chord["category"] | "All"
@@ -48,9 +52,36 @@ export default function App() {
           </h1>
           <p className="text-xs text-white/50 font-mono">guitar chords</p>
         </div>
+        <nav
+          aria-label="Sections"
+          className="mx-auto max-w-5xl px-6 -mb-px flex gap-1"
+        >
+          {(["chords", "songs"] as const).map((t) => {
+            const active = tab === t;
+            return (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                aria-pressed={active}
+                className={
+                  "px-3 py-2 text-xs font-mono uppercase tracking-wider border-b-2 " +
+                  (active
+                    ? "border-white text-white"
+                    : "border-transparent text-white/50 hover:text-white")
+                }
+              >
+                {t}
+              </button>
+            );
+          })}
+        </nav>
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-8">
+        {tab === "songs" ? (
+          <Songs />
+        ) : (
+        <>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <input
             type="search"
@@ -120,6 +151,8 @@ export default function App() {
             </p>
           )}
         </section>
+        </>
+        )}
       </main>
 
       {selected && (
@@ -199,11 +232,15 @@ export default function App() {
       )}
 
       <footer className="mx-auto max-w-5xl px-6 py-10 text-center text-xs font-mono text-white/40">
-        <p>
-          {chords.filter((c) => includeDropD || c.tuning !== "drop-d").length}{" "}
-          chords · open and barre shapes
-          {includeDropD ? " · drop D included" : ""}
-        </p>
+        {tab === "chords" ? (
+          <p>
+            {chords.filter((c) => includeDropD || c.tuning !== "drop-d").length}{" "}
+            chords · open and barre shapes
+            {includeDropD ? " · drop D included" : ""}
+          </p>
+        ) : (
+          <p>local-only · import / export JSON to save your work</p>
+        )}
       </footer>
     </div>
   );
