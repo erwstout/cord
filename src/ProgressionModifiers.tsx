@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   type ProgressionModifiers,
   type RepetitionCount,
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export default function ProgressionModifiers({ modifiers, onChange, isBlockLevel = false }: Props) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
   const updateModifier = <K extends keyof ProgressionModifiers>(
     key: K,
     value: ProgressionModifiers[K]
@@ -175,11 +178,18 @@ export default function ProgressionModifiers({ modifiers, onChange, isBlockLevel
         </div>
       </div>
 
-      {/* TIER 2 MODIFIERS */}
-      <div className="space-y-3 border-t border-white/10 pt-3">
-        <h3 className="text-xs font-mono uppercase tracking-wider text-white/60">
-          Advanced Settings
-        </h3>
+      {/* TIER 2 MODIFIERS - Collapsible */}
+      <div className="border-t border-white/10 pt-3">
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="w-full flex items-center justify-between text-xs font-mono uppercase tracking-wider text-white/60 hover:text-white transition-colors py-2"
+        >
+          <span>Advanced Settings</span>
+          <span className="text-white/40">{showAdvanced ? "−" : "+"}</span>
+        </button>
+
+        {showAdvanced && (
+          <div className="space-y-3 mt-3">
 
         {/* Tempo */}
         <div className="space-y-1.5">
@@ -283,10 +293,12 @@ export default function ProgressionModifiers({ modifiers, onChange, isBlockLevel
             ))}
           </div>
         </div>
+          </div>
+        )}
       </div>
 
       {isBlockLevel && (
-        <p className="text-[10px] text-white/40 border-t border-white/10 pt-3">
+        <p className="text-[10px] text-white/40 border-t border-white/10 pt-3 mt-3">
           Leave blank to use progression defaults
         </p>
       )}

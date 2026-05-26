@@ -201,12 +201,20 @@ export function generateProgression(vibe: VibeType, root: string): string[] {
 }
 
 export function emptyProgression(vibe: VibeType): ProgressionCollection {
+  const tempoMap: Record<VibeType, number> = {
+    "stoner-doom": 60, // Sleep, Kyuss: 50-70 BPM
+    "post-rock": 90, // Russian Circles, Mogwai: 85-95 BPM
+    industrial: 85, // Nine Inch Nails: 80-90 BPM
+    "noise-rock": 105, // Drug Church, Knocked Loose: 95-120 BPM
+    "post-punk": 105, // Gouge Away, Single Mothers: 90-120 BPM
+  };
+
   return {
     version: 1,
     title: "Untitled progression",
     vibe,
     defaults: {
-      tempo: vibe === "stoner-doom" ? 60 : vibe === "post-rock" ? 90 : 100,
+      tempo: tempoMap[vibe],
       timeSignature: "4/4",
       intensityLevel: "medium",
       capoPosition: 0,
