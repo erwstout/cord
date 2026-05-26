@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { chords, tuningLabels, type Chord } from "./chords";
 import ChordDiagram from "./ChordDiagram";
 import Songs from "./Songs";
+import Progressions from "./Progressions";
 
 const categories: Chord["category"][] = [
   "Major",
@@ -12,7 +13,7 @@ const categories: Chord["category"][] = [
   "Sus",
 ];
 
-type Tab = "chords" | "songs";
+type Tab = "chords" | "songs" | "progressions";
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("chords");
@@ -56,7 +57,7 @@ export default function App() {
           aria-label="Sections"
           className="mx-auto max-w-5xl px-6 -mb-px flex gap-1"
         >
-          {(["chords", "songs"] as const).map((t) => {
+          {(["chords", "songs", "progressions"] as const).map((t) => {
             const active = tab === t;
             return (
               <button
@@ -80,6 +81,8 @@ export default function App() {
       <main className="mx-auto max-w-5xl px-6 py-8">
         {tab === "songs" ? (
           <Songs />
+        ) : tab === "progressions" ? (
+          <Progressions />
         ) : (
         <>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
