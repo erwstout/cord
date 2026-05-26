@@ -27,6 +27,7 @@ import {
   type DisplayMode,
   type ProgressionBlock,
   type ProgressionCollection,
+  type ProgressionModifiers,
   type VibeType,
 } from "./progressions";
 import ProgressionGenerator from "./ProgressionGenerator";
@@ -69,7 +70,7 @@ export default function Progressions() {
       ...progression,
       blocks: [
         ...progression.blocks,
-        { id: newId(), label: "Section", chordIds: [] },
+        { id: newId(), label: "Section", chordIds: [], modifiers: {} },
       ],
     });
   };
@@ -147,6 +148,13 @@ export default function Progressions() {
 
   const handleGenerateNew = (vibe: VibeType) => {
     setProgression(emptyProgression(vibe));
+  };
+
+  const handleDefaultsChange = (defaults: Partial<ProgressionModifiers>) => {
+    setProgression({
+      ...progression,
+      defaults,
+    });
   };
 
   const vibeLabel = vibeLabels[progression.vibe];
@@ -252,6 +260,7 @@ export default function Progressions() {
                   onChange={(next) => updateBlock(b.id, next)}
                   onDuplicate={() => duplicateBlock(b.id)}
                   onDelete={() => deleteBlock(b.id)}
+                  defaults={progression.defaults}
                 />
               ))}
             </div>
@@ -281,6 +290,7 @@ export default function Progressions() {
           progression={progression}
           onGenerate={handleGenerateChords}
           onGenerateNew={handleGenerateNew}
+          onDefaultsChange={handleDefaultsChange}
         />
       </div>
     </div>

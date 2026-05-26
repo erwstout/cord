@@ -3,7 +3,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { chords } from "./chords";
 import ChordDiagram from "./ChordDiagram";
-import { chordNameById, type DisplayMode, type ProgressionBlock } from "./progressions";
+import ProgressionModifiersPanel from "./ProgressionModifiers";
+import { chordNameById, getBlockModifiers, type DisplayMode, type ProgressionBlock, type ProgressionModifiers } from "./progressions";
 import ChordPicker from "./ChordPicker";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   onChange: (block: ProgressionBlock) => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  defaults: Partial<ProgressionModifiers>;
 };
 
 export default function ProgressionBlockCard({
@@ -20,6 +22,7 @@ export default function ProgressionBlockCard({
   onChange,
   onDuplicate,
   onDelete,
+  defaults,
 }: Props) {
   const {
     attributes,
@@ -31,6 +34,9 @@ export default function ProgressionBlockCard({
   } = useSortable({ id: block.id });
 
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [modifiersOpen, setModifiersOpen] = useState(false);
+
+  const blockModifiers = getBlockModifiers(block, defaults);
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -46,6 +52,13 @@ export default function ProgressionBlockCard({
     onChange({
       ...block,
       chordIds: block.chordIds.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateModifiers = (modifiers: Partial<ProgressionModifiers>) => {
+    onChange({
+      ...block,
+      modifiers,
     });
   };
 
@@ -72,6 +85,21 @@ export default function ProgressionBlockCard({
           placeholder="Section name"
           className="flex-1 bg-transparent border-0 px-2 py-1 text-sm font-mono outline-none focus:bg-white/5 placeholder:text-white/30"
         />
+        <div className="flex items-center gap-1 px-2 py-1 text-[10px] font-mono text-white/50">
+          <span title="Repetition count">×{blockModifiers.repetitionCount}</span>
+          {blockModifiers.capoPosition > 0 && (
+            <span title="Capo position">capo {blockModifiers.capoPosition}</span>
+          )}
+          <span title="Tempo">{blockModifiers.tempo}bpm</span>
+        </div>
+        <button
+          onClick={() => setModifiersOpen(true)}
+          aria-label="Edit modifiers"
+          title="Edit modifiers"
+          className="px-2 py-1 text-xs font-mono text-white/60 hover:text-white border border-white/20 hover:border-white"
+        >
+          mod
+        </button>
         <button
           onClick={onDuplicate}
           aria-label="Duplicate block"
@@ -158,6 +186,37 @@ export default function ProgressionBlockCard({
           onPick={addChord}
           onClose={() => setPickerOpen(false)}
         />
+      )}
+
+      {modifiersOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+          onClick={() => setModifiersOpen(false)}
+        >
+          <div
+            className="border border-white/30 bg-black p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="text-lg font-mono">{block.label} Modifiers</h2>
+              <button
+                onClick={() => setModifiersOpen(false)}
+                aria-label="Close"
+                className="font-mono text-white/60 hover:text-white text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+
+            <ProgressionModifiersPanel
+              modifiers={block.modifiers}
+              onChange={updateModifiers}
+              isBlockLevel
+            />
+          </div>
+        </div>
       )}
     </div>
   );

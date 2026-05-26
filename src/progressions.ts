@@ -20,10 +20,34 @@ export const vibeLabels: Record<VibeType, VibeLabel> = {
   "stoner-doom": { genre: "Stoner/Doom", mood: "Dark" },
 };
 
+export type RepetitionCount = 1 | 2 | 4 | 8;
+export type CapoPosition = 0 | 2 | 3 | 5 | 7 | 9 | 12;
+export type SusResolution = "major" | "minor" | "none";
+export type IntensityLevel = "quiet" | "medium" | "loud";
+export type RelativeKey = "major" | "minor";
+export type TimeSignature = "4/4" | "3/4" | "6/8" | "5/4" | "7/4";
+export type InversionMode = "root" | "first" | "second";
+export type ArpeggioPattern = "block" | "arpeggio";
+export type TensionCurve = "ascending" | "descending" | "plateau" | "wave";
+
+export type ProgressionModifiers = {
+  repetitionCount: RepetitionCount;
+  capoPosition: CapoPosition;
+  susResolution: SusResolution;
+  intensityLevel: IntensityLevel;
+  relativeKey: RelativeKey;
+  tempo: number;
+  timeSignature: TimeSignature;
+  inversionMode: InversionMode;
+  arpeggiation: ArpeggioPattern;
+  tensionCurve: TensionCurve;
+};
+
 export type ProgressionBlock = {
   id: string;
   label: string;
   chordIds: string[];
+  modifiers: Partial<ProgressionModifiers>;
 };
 
 export type ProgressionCollection = {
@@ -31,6 +55,7 @@ export type ProgressionCollection = {
   title: string;
   vibe: VibeType;
   blocks: ProgressionBlock[];
+  defaults: Partial<ProgressionModifiers>;
 };
 
 export type DisplayMode = "names" | "graphs";
@@ -180,8 +205,20 @@ export function emptyProgression(vibe: VibeType): ProgressionCollection {
     version: 1,
     title: "Untitled progression",
     vibe,
+    defaults: {
+      tempo: vibe === "stoner-doom" ? 60 : vibe === "post-rock" ? 90 : 100,
+      timeSignature: "4/4",
+      intensityLevel: "medium",
+      capoPosition: 0,
+      repetitionCount: 2,
+      susResolution: "major",
+      relativeKey: "minor",
+      inversionMode: "root",
+      arpeggiation: "block",
+      tensionCurve: "ascending",
+    },
     blocks: [
-      { id: newId(), label: "Section", chordIds: [] },
+      { id: newId(), label: "Section", chordIds: [], modifiers: {} },
     ],
   };
 }
@@ -213,6 +250,7 @@ export function validateCollection(value: unknown): ProgressionCollection | null
   if (typeof v.title !== "string") return null;
   if (typeof v.vibe !== "string" || !Object.keys(vibeLabels).includes(v.vibe)) return null;
   if (!Array.isArray(v.blocks)) return null;
+
   const blocks: ProgressionBlock[] = [];
   for (const b of v.blocks) {
     if (!b || typeof b !== "object") return null;
@@ -225,9 +263,18 @@ export function validateCollection(value: unknown): ProgressionCollection | null
       id: block.id,
       label: block.label,
       chordIds: block.chordIds as string[],
+      modifiers: (block.modifiers as Partial<ProgressionModifiers>) || {},
     });
   }
-  return { version: 1, title: v.title, vibe: v.vibe as VibeType, blocks };
+
+  const defaults = (v.defaults as Partial<ProgressionModifiers>) || {};
+  return {
+    version: 1,
+    title: v.title,
+    vibe: v.vibe as VibeType,
+    blocks,
+    defaults,
+  };
 }
 
 export function exportProgression(progression: ProgressionCollection): void {
@@ -249,4 +296,22 @@ export function exportProgression(progression: ProgressionCollection): void {
 
 export function chordNameById(id: string): string {
   return chords.find((c) => c.id === id)?.name ?? id;
+}
+
+export function getBlockModifiers(
+  block: ProgressionBlock,
+  defaults: Partial<ProgressionModifiers>
+): ProgressionModifiers {
+  return {
+    repetitionCount: block.modifiers.repetitionCount ?? (defaults.repetitionCount as RepetitionCount) ?? 2,
+    capoPosition: block.modifiers.capoPosition ?? (defaults.capoPosition as CapoPosition) ?? 0,
+    susResolution: block.modifiers.susResolution ?? (defaults.susResolution as SusResolution) ?? "major",
+    intensityLevel: block.modifiers.intensityLevel ?? (defaults.intensityLevel as IntensityLevel) ?? "medium",
+    relativeKey: block.modifiers.relativeKey ?? (defaults.relativeKey as RelativeKey) ?? "minor",
+    tempo: block.modifiers.tempo ?? (defaults.tempo as number) ?? 100,
+    timeSignature: block.modifiers.timeSignature ?? (defaults.timeSignature as TimeSignature) ?? "4/4",
+    inversionMode: block.modifiers.inversionMode ?? (defaults.inversionMode as InversionMode) ?? "root",
+    arpeggiation: block.modifiers.arpeggiation ?? (defaults.arpeggiation as ArpeggioPattern) ?? "block",
+    tensionCurve: block.modifiers.tensionCurve ?? (defaults.tensionCurve as TensionCurve) ?? "ascending",
+  };
 }

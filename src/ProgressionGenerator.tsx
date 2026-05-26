@@ -3,8 +3,10 @@ import {
   generateProgression,
   vibeLabels,
   type ProgressionCollection,
+  type ProgressionModifiers,
   type VibeType,
 } from "./progressions";
+import ProgressionModifiersPanel from "./ProgressionModifiers";
 import ChordDiagram from "./ChordDiagram";
 import { chords } from "./chords";
 
@@ -15,9 +17,15 @@ type Props = {
   progression: ProgressionCollection;
   onGenerate: (newChordIds: string[], blockId: string) => void;
   onGenerateNew: (vibe: VibeType) => void;
+  onDefaultsChange: (defaults: Partial<ProgressionModifiers>) => void;
 };
 
-export default function ProgressionGenerator({ progression, onGenerate, onGenerateNew }: Props) {
+export default function ProgressionGenerator({
+  progression,
+  onGenerate,
+  onGenerateNew,
+  onDefaultsChange,
+}: Props) {
   const [selectedRoot, setSelectedRoot] = useState("C");
   const [selectedVibe, setSelectedVibe] = useState<VibeType>(progression.vibe);
   const [selectedChordId, setSelectedChordId] = useState<string | null>(null);
@@ -105,6 +113,17 @@ export default function ProgressionGenerator({ progression, onGenerate, onGenera
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Modifiers */}
+      <div className="pt-6 border-t border-white/15">
+        <h3 className="text-xs font-mono uppercase tracking-wider text-white/60 mb-4">
+          Progression Settings
+        </h3>
+        <ProgressionModifiersPanel
+          modifiers={progression.defaults}
+          onChange={onDefaultsChange}
+        />
       </div>
 
       {/* Chord Viewer */}
