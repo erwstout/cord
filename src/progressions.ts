@@ -45,13 +45,41 @@ export function newId(): string {
 const chordRoots = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 function getChordsByRoot(root: string, category: string): Chord[] {
-  return chords.filter((c) => c.name.startsWith(root) && c.category === category);
+  return chords.filter(
+    (c) =>
+      c.name.startsWith(root) &&
+      c.category === category &&
+      !c.tuning // exclude special tunings for now
+  );
 }
 
 function getRandomChord(root: string, categories: string[]): Chord | null {
-  const category = categories[Math.floor(Math.random() * categories.length)];
-  const matching = getChordsByRoot(root, category);
-  return matching.length > 0 ? matching[Math.floor(Math.random() * matching.length)] : null;
+  // Shuffle categories to try them in random order
+  const shuffledCategories = [...categories].sort(() => Math.random() - 0.5);
+
+  for (const category of shuffledCategories) {
+    const matching = getChordsByRoot(root, category);
+    if (matching.length > 0) {
+      return matching[Math.floor(Math.random() * matching.length)];
+    }
+  }
+
+  // Fallback: if exact root not found, try adjacent semitones
+  const fallbackRoots = [
+    chordRoots[(chordRoots.indexOf(root) - 1 + chordRoots.length) % chordRoots.length],
+    chordRoots[(chordRoots.indexOf(root) + 1) % chordRoots.length],
+  ];
+
+  for (const fallbackRoot of fallbackRoots) {
+    for (const category of shuffledCategories) {
+      const matching = getChordsByRoot(fallbackRoot, category);
+      if (matching.length > 0) {
+        return matching[Math.floor(Math.random() * matching.length)];
+      }
+    }
+  }
+
+  return null;
 }
 
 // Pattern: [degree offset from root, categories to choose from]
@@ -110,10 +138,11 @@ function generateNoiseRock(root: string): string[] {
 
 function generatePostPunk(root: string): string[] {
   const patterns: ProgressionPattern[] = [
-    [[0, ["Minor"]], [11, ["Major"]]],
+    [[0, ["Minor"]], [11, ["Minor", "7th"]]],
     [[0, ["Minor"]], [5, ["Minor"]]],
-    [[8, ["Major"]], [11, ["Major"]], [0, ["Minor"]]],
-    [[0, ["Minor"]], [5, ["Minor"]], [11, ["Major"]]],
+    [[9, ["Minor", "Major"]], [11, ["Minor"]], [0, ["Minor"]]],
+    [[0, ["Minor"]], [5, ["Minor"]], [11, ["Minor"]]],
+    [[0, ["Minor"]], [7, ["Major"]], [0, ["Minor"]]],
   ];
   const pattern = patterns[Math.floor(Math.random() * patterns.length)];
   return generateProgressionFromPattern(root, pattern);
@@ -121,10 +150,11 @@ function generatePostPunk(root: string): string[] {
 
 function generateStonerDoom(root: string): string[] {
   const patterns: ProgressionPattern[] = [
-    [[0, ["Minor"]], [11, ["Major"]], [0, ["Minor"]]],
+    [[0, ["Minor"]], [11, ["Minor", "7th"]], [0, ["Minor"]]],
     [[0, ["Minor"]], [5, ["Minor"]], [0, ["Minor"]]],
-    [[0, ["Minor"]], [5, ["Minor"]], [11, ["Major"]], [0, ["Minor"]]],
-    [[0, ["Minor"]], [3, ["Minor"]], [0, ["Minor"]]],
+    [[0, ["Minor"]], [5, ["Minor"]], [11, ["Minor"]], [0, ["Minor"]]],
+    [[0, ["Minor"]], [7, ["Minor"]], [0, ["Minor"]]],
+    [[0, ["Minor"]], [11, ["7th"]], [5, ["Minor"]], [0, ["Minor"]]],
   ];
   const pattern = patterns[Math.floor(Math.random() * patterns.length)];
   return generateProgressionFromPattern(root, pattern);
