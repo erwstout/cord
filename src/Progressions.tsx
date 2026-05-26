@@ -31,8 +31,6 @@ import {
 } from "./progressions";
 import ProgressionGenerator from "./ProgressionGenerator";
 
-const vibes: VibeType[] = ["post-rock", "industrial", "noise-rock", "post-punk", "stoner-doom"];
-
 export default function Progressions() {
   const [progression, setProgression] = useState<ProgressionCollection>(() => {
     const loaded = loadProgression();

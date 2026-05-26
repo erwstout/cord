@@ -5,7 +5,6 @@ import {
   type ProgressionCollection,
   type VibeType,
 } from "./progressions";
-import { chordNameById } from "./progressions";
 import ChordDiagram from "./ChordDiagram";
 import { chords } from "./chords";
 
