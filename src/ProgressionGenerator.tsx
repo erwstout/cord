@@ -1,5 +1,16 @@
 import { useState } from "react";
 import {
+  Box,
+  Stack,
+  Button,
+  Typography,
+  SectionLabel,
+  Divider,
+  ToggleButton,
+  ToggleButtonGroup,
+  Modal,
+} from "@buschschwick/uac-ui";
+import {
   generateProgression,
   vibeLabels,
   type ProgressionCollection,
@@ -47,140 +58,142 @@ export default function ProgressionGenerator({
     : null;
 
   return (
-    <div className="space-y-6">
+    <Stack spacing={3}>
       {/* Vibe Selector */}
-      <div className="space-y-3">
-        <label className="block text-xs font-mono uppercase tracking-wider text-white/60">
-          Vibe
-        </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+      <Stack spacing={1.5}>
+        <SectionLabel>Vibe</SectionLabel>
+        <ToggleButtonGroup
+          exclusive
+          value={selectedVibe}
+          onChange={(_, v: VibeType | null) => v && handleChangeVibe(v)}
+          orientation="vertical"
+          sx={{ "& .MuiToggleButton-root": { justifyContent: "flex-start", textAlign: "left" } }}
+        >
           {vibes.map((vibe) => {
             const label = vibeLabels[vibe];
-            const isActive = selectedVibe === vibe;
             return (
-              <button
-                key={vibe}
-                onClick={() => handleChangeVibe(vibe)}
-                className={`px-3 py-2 text-xs font-mono border text-left transition-colors ${
-                  isActive
-                    ? "border-white bg-white text-black"
-                    : "border-white/30 text-white/70 hover:border-white hover:text-white"
-                }`}
-              >
-                <div className="font-semibold">{label.genre}</div>
-                <div className="text-[9px] opacity-70">{label.mood}</div>
-              </button>
+              <ToggleButton key={vibe} value={vibe}>
+                <Box>
+                  <Box sx={{ fontWeight: 600 }}>{label.genre}</Box>
+                  <Box sx={{ fontSize: 9, opacity: 0.7 }}>{label.mood}</Box>
+                </Box>
+              </ToggleButton>
             );
           })}
-        </div>
-      </div>
+        </ToggleButtonGroup>
+      </Stack>
 
       {/* Root Note Selector */}
-      <div className="space-y-3">
-        <label className="block text-xs font-mono uppercase tracking-wider text-white/60">
-          Root Note
-        </label>
-        <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5">
+      <Stack spacing={1.5}>
+        <SectionLabel>Root Note</SectionLabel>
+        <ToggleButtonGroup
+          exclusive
+          value={selectedRoot}
+          onChange={(_, v: string | null) => v && setSelectedRoot(v)}
+          sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(4, 1fr)", sm: "repeat(6, 1fr)" }, gap: 0.75 }}
+        >
           {chordRoots.map((root) => (
-            <button
-              key={root}
-              onClick={() => setSelectedRoot(root)}
-              className={`px-2 py-1.5 text-xs font-mono border ${
-                selectedRoot === root
-                  ? "border-white bg-white text-black"
-                  : "border-white/30 text-white/70 hover:border-white hover:text-white"
-              }`}
-            >
+            <ToggleButton key={root} value={root}>
               {root}
-            </button>
+            </ToggleButton>
           ))}
-        </div>
-      </div>
+        </ToggleButtonGroup>
+      </Stack>
 
       {/* Generate Buttons for Each Block */}
-      <div className="space-y-3">
-        <label className="block text-xs font-mono uppercase tracking-wider text-white/60">
-          Generate Chords
-        </label>
-        <div className="space-y-2">
+      <Stack spacing={1.5}>
+        <SectionLabel>Generate Chords</SectionLabel>
+        <Stack spacing={1}>
           {progression.blocks.map((block) => (
-            <button
+            <Button
               key={block.id}
+              variant="outlined"
               onClick={() => handleGenerateForBlock(block.id)}
-              className="w-full px-3 py-2 text-xs font-mono border border-white/30 hover:border-white text-white/70 hover:text-white transition-colors text-left"
+              sx={{ justifyContent: "flex-start" }}
             >
               Generate for "{block.label}"
-            </button>
+            </Button>
           ))}
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
       {/* Modifiers */}
-      <div className="pt-6 border-t border-white/15">
-        <h3 className="text-xs font-mono uppercase tracking-wider text-white/60 mb-4">
+      <Box sx={{ pt: 3 }}>
+        <Divider sx={{ mb: 2 }} />
+        <SectionLabel sx={{ display: "block", mb: 2 }}>
           Progression Settings
-        </h3>
+        </SectionLabel>
         <ProgressionModifiersPanel
           modifiers={progression.defaults}
           onChange={onDefaultsChange}
         />
-      </div>
+      </Box>
 
       {/* Chord Viewer */}
-      <div className="pt-6 border-t border-white/15">
-        <h3 className="text-xs font-mono uppercase tracking-wider text-white/60 mb-4">
+      <Box sx={{ pt: 3 }}>
+        <Divider sx={{ mb: 2 }} />
+        <SectionLabel sx={{ display: "block", mb: 2 }}>
           Quick Reference
-        </h3>
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+        </SectionLabel>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "repeat(3, 1fr)", sm: "repeat(4, 1fr)", md: "repeat(6, 1fr)" },
+            gap: 1,
+          }}
+        >
           {chords.slice(0, 24).map((c) => (
-            <button
+            <Box
               key={c.id}
+              component="button"
               onClick={() => setSelectedChordId(c.id)}
-              className="group relative border border-white/20 hover:border-white p-2 flex flex-col items-center gap-1.5 transition-colors"
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                bgcolor: "background.default",
+                color: "text.primary",
+                cursor: "pointer",
+                p: 1,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 0.75,
+                transition: "border-color .15s",
+                "&:hover": { borderColor: "text.primary" },
+              }}
             >
               <ChordDiagram shape={c.shape} size={80} showFingers={false} />
-              <span className="font-mono text-xs text-white/70 group-hover:text-white">
+              <Typography component="span" variant="caption">
                 {c.name}
-              </span>
-            </button>
+              </Typography>
+            </Box>
           ))}
-        </div>
-      </div>
+        </Box>
+      </Box>
 
       {/* Chord Detail Modal */}
-      {selectedChord && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-          onClick={() => setSelectedChordId(null)}
-        >
-          <div
-            className="border border-white/30 bg-black p-6 sm:p-8 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-baseline justify-between mb-6">
-              <div>
-                <h2 className="text-3xl font-mono">{selectedChord.name}</h2>
-                <p className="text-xs font-mono text-white/50 uppercase tracking-wider mt-1">
-                  {selectedChord.category}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedChordId(null)}
-                aria-label="Close"
-                className="font-mono text-white/60 hover:text-white text-2xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="flex justify-center">
+      <Modal
+        open={selectedChord != null}
+        onClose={() => setSelectedChordId(null)}
+        maxWidth="xs"
+        fullWidth
+      >
+        {selectedChord && (
+          <Box>
+            <Box sx={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", mb: 3 }}>
+              <Box>
+                <Typography sx={{ fontSize: 30, fontFamily: "monospace" }}>
+                  {selectedChord.name}
+                </Typography>
+                <SectionLabel sx={{ mt: 0.5 }}>{selectedChord.category}</SectionLabel>
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
               <ChordDiagram shape={selectedChord.shape} size={280} />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+            </Box>
+          </Box>
+        )}
+      </Modal>
+    </Stack>
   );
 }

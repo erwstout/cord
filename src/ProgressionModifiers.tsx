@@ -1,5 +1,19 @@
 import { useState } from "react";
 import {
+  Box,
+  Stack,
+  Button,
+  Typography,
+  SectionLabel,
+  Divider,
+  Collapse,
+  Slider,
+  Select,
+  MenuItem,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@buschschwick/uac-ui";
+import {
   type ProgressionModifiers,
   type RepetitionCount,
   type CapoPosition,
@@ -68,240 +82,257 @@ export default function ProgressionModifiers({ modifiers, onChange, isBlockLevel
     second: "2nd inversion",
   };
 
+  const fieldLabelSx = {
+    display: "block",
+    color: "text.secondary",
+    fontSize: 12,
+  } as const;
+
   return (
-    <div className="space-y-4">
+    <Stack spacing={2}>
       {/* TIER 1 MODIFIERS */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-mono uppercase tracking-wider text-white/60">
-          Core Modifiers
-        </h3>
+      <Stack spacing={1.5}>
+        <SectionLabel>Core Modifiers</SectionLabel>
 
         {/* Repetition Count */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">
+        <Stack spacing={0.75}>
+          <Typography component="label" sx={fieldLabelSx}>
             Repetition (beats per chord)
-          </label>
-          <div className="flex gap-1">
+          </Typography>
+          <ToggleButtonGroup
+            exclusive
+            value={currentRep}
+            onChange={(_, v: RepetitionCount | null) =>
+              v != null && updateModifier("repetitionCount", v)
+            }
+            fullWidth
+          >
             {repetitionCounts.map((count) => (
-              <button
-                key={count}
-                onClick={() => updateModifier("repetitionCount", count)}
-                className={`flex-1 px-2 py-1 text-xs font-mono border ${
-                  currentRep === count
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
-              >
+              <ToggleButton key={count} value={count} sx={{ flex: 1 }}>
                 {count}x
-              </button>
+              </ToggleButton>
             ))}
-          </div>
-        </div>
+          </ToggleButtonGroup>
+        </Stack>
 
         {/* Capo Position */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Capo Position</label>
-          <select
+        <Stack spacing={0.75}>
+          <Typography component="label" sx={fieldLabelSx}>
+            Capo Position
+          </Typography>
+          <Select
             value={currentCapo}
-            onChange={(e) => updateModifier("capoPosition", parseInt(e.target.value) as CapoPosition)}
-            className="w-full bg-black border border-white/30 px-2 py-1 text-xs font-mono text-white outline-none focus:border-white"
+            onChange={(e) =>
+              updateModifier("capoPosition", Number(e.target.value) as CapoPosition)
+            }
+            size="small"
+            fullWidth
           >
             {capoPositions.map((pos) => (
-              <option key={pos} value={pos}>
+              <MenuItem key={pos} value={pos}>
                 {capoLabels[pos as CapoPosition]}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </Select>
+        </Stack>
 
         {/* Intensity Level */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Intensity</label>
-          <div className="grid grid-cols-3 gap-1">
+        <Stack spacing={0.75}>
+          <Typography component="label" sx={fieldLabelSx}>
+            Intensity
+          </Typography>
+          <ToggleButtonGroup
+            exclusive
+            value={currentIntensity}
+            onChange={(_, v: IntensityLevel | null) =>
+              v && updateModifier("intensityLevel", v)
+            }
+            sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0.5 }}
+          >
             {(["quiet", "medium", "loud"] as const).map((level) => (
-              <button
-                key={level}
-                onClick={() => updateModifier("intensityLevel", level)}
-                className={`px-2 py-2 text-xs font-mono border text-center transition-colors ${
-                  currentIntensity === level
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
-              >
-                <div className="font-semibold capitalize">{level}</div>
-                <div className="text-[9px] opacity-60">
+              <ToggleButton key={level} value={level} sx={{ flexDirection: "column" }}>
+                <Box sx={{ fontWeight: 600, textTransform: "capitalize" }}>{level}</Box>
+                <Box sx={{ fontSize: 9, opacity: 0.6 }}>
                   {intensityDescriptions[level]}
-                </div>
-              </button>
+                </Box>
+              </ToggleButton>
             ))}
-          </div>
-        </div>
+          </ToggleButtonGroup>
+        </Stack>
 
         {/* Sus Resolution */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Sus Resolution</label>
-          <div className="flex gap-1">
+        <Stack spacing={0.75}>
+          <Typography component="label" sx={fieldLabelSx}>
+            Sus Resolution
+          </Typography>
+          <ToggleButtonGroup
+            exclusive
+            value={currentSusRes}
+            onChange={(_, v: SusResolution | null) =>
+              v && updateModifier("susResolution", v)
+            }
+            fullWidth
+          >
             {(["major", "minor", "none"] as const).map((res) => (
-              <button
-                key={res}
-                onClick={() => updateModifier("susResolution", res)}
-                className={`flex-1 px-2 py-1 text-xs font-mono border capitalize ${
-                  currentSusRes === res
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
-              >
+              <ToggleButton key={res} value={res} sx={{ flex: 1, textTransform: "capitalize" }}>
                 {res}
-              </button>
+              </ToggleButton>
             ))}
-          </div>
-        </div>
+          </ToggleButtonGroup>
+        </Stack>
 
         {/* Relative Key */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Key</label>
-          <div className="flex gap-1">
+        <Stack spacing={0.75}>
+          <Typography component="label" sx={fieldLabelSx}>
+            Key
+          </Typography>
+          <ToggleButtonGroup
+            exclusive
+            value={currentKey}
+            onChange={(_, v: RelativeKey | null) => v && updateModifier("relativeKey", v)}
+            fullWidth
+          >
             {(["major", "minor"] as const).map((key) => (
-              <button
-                key={key}
-                onClick={() => updateModifier("relativeKey", key)}
-                className={`flex-1 px-2 py-1 text-xs font-mono border capitalize ${
-                  currentKey === key
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
-              >
+              <ToggleButton key={key} value={key} sx={{ flex: 1, textTransform: "capitalize" }}>
                 {key}
-              </button>
+              </ToggleButton>
             ))}
-          </div>
-        </div>
-      </div>
+          </ToggleButtonGroup>
+        </Stack>
+      </Stack>
 
       {/* TIER 2 MODIFIERS - Collapsible */}
-      <div className="border-t border-white/10 pt-3">
-        <button
+      <Box>
+        <Divider sx={{ mb: 1 }} />
+        <Button
+          variant="text"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full flex items-center justify-between text-xs font-mono uppercase tracking-wider text-white/60 hover:text-white transition-colors py-2"
+          sx={{ width: "100%", justifyContent: "space-between" }}
         >
-          <span>Advanced Settings</span>
-          <span className="text-white/40">{showAdvanced ? "−" : "+"}</span>
-        </button>
+          <SectionLabel>Advanced Settings</SectionLabel>
+          <Box component="span" sx={{ color: "text.secondary" }}>
+            {showAdvanced ? "−" : "+"}
+          </Box>
+        </Button>
 
-        {showAdvanced && (
-          <div className="space-y-3 mt-3">
+        <Collapse in={showAdvanced}>
+          <Stack spacing={1.5} sx={{ mt: 1.5 }}>
+            {/* Tempo */}
+            <Stack spacing={0.75}>
+              <Typography component="label" sx={fieldLabelSx}>
+                Tempo: {currentTempo} BPM
+              </Typography>
+              <Slider
+                value={currentTempo}
+                onChange={(_, v) => updateModifier("tempo", v as number)}
+                min={40}
+                max={180}
+                step={10}
+              />
+              <Box sx={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "text.secondary" }}>
+                <Box component="span">40 BPM (Doom)</Box>
+                <Box component="span">180 BPM (Industrial)</Box>
+              </Box>
+            </Stack>
 
-        {/* Tempo */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">
-            Tempo: {currentTempo} BPM
-          </label>
-          <input
-            type="range"
-            min="40"
-            max="180"
-            step="10"
-            value={currentTempo}
-            onChange={(e) => updateModifier("tempo", parseInt(e.target.value))}
-            className="w-full h-1 bg-white/20 rounded accent-white"
-          />
-          <div className="flex justify-between text-[9px] text-white/40 font-mono">
-            <span>40 BPM (Doom)</span>
-            <span>180 BPM (Industrial)</span>
-          </div>
-        </div>
-
-        {/* Time Signature */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Time Signature</label>
-          <div className="grid grid-cols-5 gap-1">
-            {timeSignatures.map((ts) => (
-              <button
-                key={ts}
-                onClick={() => updateModifier("timeSignature", ts)}
-                className={`px-2 py-1 text-xs font-mono border ${
-                  currentTime === ts
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
+            {/* Time Signature */}
+            <Stack spacing={0.75}>
+              <Typography component="label" sx={fieldLabelSx}>
+                Time Signature
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                value={currentTime}
+                onChange={(_, v: TimeSignature | null) =>
+                  v && updateModifier("timeSignature", v)
+                }
+                sx={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 0.5 }}
               >
-                {ts}
-              </button>
-            ))}
-          </div>
-        </div>
+                {timeSignatures.map((ts) => (
+                  <ToggleButton key={ts} value={ts}>
+                    {ts}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
 
-        {/* Inversion */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Inversion</label>
-          <div className="grid grid-cols-3 gap-1">
-            {inversions.map((inv) => (
-              <button
-                key={inv}
-                onClick={() => updateModifier("inversionMode", inv)}
-                className={`px-2 py-2 text-xs font-mono border text-center ${
-                  currentInv === inv
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
+            {/* Inversion */}
+            <Stack spacing={0.75}>
+              <Typography component="label" sx={fieldLabelSx}>
+                Inversion
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                value={currentInv}
+                onChange={(_, v: InversionMode | null) =>
+                  v && updateModifier("inversionMode", v)
+                }
+                sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0.5 }}
               >
-                <div className="font-semibold capitalize">{inv}</div>
-                <div className="text-[9px] opacity-60">
-                  {inversionLabels[inv as InversionMode]}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+                {inversions.map((inv) => (
+                  <ToggleButton key={inv} value={inv} sx={{ flexDirection: "column" }}>
+                    <Box sx={{ fontWeight: 600, textTransform: "capitalize" }}>{inv}</Box>
+                    <Box sx={{ fontSize: 9, opacity: 0.6 }}>
+                      {inversionLabels[inv as InversionMode]}
+                    </Box>
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
 
-        {/* Arpeggiation */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Arpeggiation</label>
-          <div className="flex gap-1">
-            {arpeggiations.map((arp) => (
-              <button
-                key={arp}
-                onClick={() => updateModifier("arpeggiation", arp)}
-                className={`flex-1 px-2 py-1 text-xs font-mono border capitalize ${
-                  currentArp === arp
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
+            {/* Arpeggiation */}
+            <Stack spacing={0.75}>
+              <Typography component="label" sx={fieldLabelSx}>
+                Arpeggiation
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                value={currentArp}
+                onChange={(_, v: ArpeggioPattern | null) =>
+                  v && updateModifier("arpeggiation", v)
+                }
+                fullWidth
               >
-                {arp}
-              </button>
-            ))}
-          </div>
-        </div>
+                {arpeggiations.map((arp) => (
+                  <ToggleButton key={arp} value={arp} sx={{ flex: 1, textTransform: "capitalize" }}>
+                    {arp}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
 
-        {/* Tension Curve */}
-        <div className="space-y-1.5">
-          <label className="block text-xs font-mono text-white/50">Tension Curve</label>
-          <div className="grid grid-cols-2 gap-1">
-            {tensions.map((tension) => (
-              <button
-                key={tension}
-                onClick={() => updateModifier("tensionCurve", tension)}
-                className={`px-2 py-1 text-xs font-mono border capitalize ${
-                  currentTension === tension
-                    ? "bg-white text-black border-white"
-                    : "border-white/30 text-white/70 hover:border-white"
-                }`}
+            {/* Tension Curve */}
+            <Stack spacing={0.75}>
+              <Typography component="label" sx={fieldLabelSx}>
+                Tension Curve
+              </Typography>
+              <ToggleButtonGroup
+                exclusive
+                value={currentTension}
+                onChange={(_, v: TensionCurve | null) =>
+                  v && updateModifier("tensionCurve", v)
+                }
+                sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 0.5 }}
               >
-                {tension}
-              </button>
-            ))}
-          </div>
-        </div>
-          </div>
-        )}
-      </div>
+                {tensions.map((tension) => (
+                  <ToggleButton key={tension} value={tension} sx={{ textTransform: "capitalize" }}>
+                    {tension}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
+          </Stack>
+        </Collapse>
+      </Box>
 
       {isBlockLevel && (
-        <p className="text-[10px] text-white/40 border-t border-white/10 pt-3 mt-3">
-          Leave blank to use progression defaults
-        </p>
+        <Box>
+          <Divider sx={{ mb: 1.5 }} />
+          <Typography sx={{ fontSize: 10, color: "text.secondary" }}>
+            Leave blank to use progression defaults
+          </Typography>
+        </Box>
       )}
-    </div>
+    </Stack>
   );
 }
