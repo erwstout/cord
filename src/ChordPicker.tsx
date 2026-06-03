@@ -1,4 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Box,
+  Stack,
+  Input,
+  IconButton,
+  Typography,
+  SectionLabel,
+  Modal,
+} from "@buschschwick/uac-ui";
 import { chords } from "./chords";
 
 type Props = {
@@ -14,14 +23,6 @@ export default function ChordPicker({ onPick, onClose }: Props) {
     inputRef.current?.focus();
   }, []);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return chords.slice(0, 24);
@@ -35,62 +36,92 @@ export default function ChordPicker({ onPick, onClose }: Props) {
   }, [query]);
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-start justify-center p-4 sm:p-8 z-50"
-      onClick={onClose}
-    >
-      <div
-        className="border border-white/30 bg-black p-4 sm:p-5 w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-2 mb-3">
-          <input
-            ref={inputRef}
+    <Modal open onClose={onClose} maxWidth="sm" fullWidth>
+      <Box>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+          <Input
+            inputRef={inputRef}
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="search chords…"
-            className="flex-1 bg-black border border-white/30 focus:border-white px-3 py-2 text-sm font-mono outline-none placeholder:text-white/40"
+            sx={{ flex: 1 }}
           />
-          <button
-            onClick={onClose}
+          <IconButton
             aria-label="Close"
-            className="font-mono text-white/60 hover:text-white text-2xl leading-none px-2"
+            onClick={onClose}
+            sx={{ fontSize: 24, lineHeight: 1 }}
           >
             ×
-          </button>
-        </div>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 max-h-[60vh] overflow-auto">
+          </IconButton>
+        </Stack>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "repeat(3, 1fr)", sm: "repeat(4, 1fr)" },
+            gap: 0.75,
+            maxHeight: "60vh",
+            overflow: "auto",
+          }}
+        >
           {results.map((c) => (
-            <button
+            <Box
               key={c.id}
+              component="button"
               onClick={() => {
                 onPick(c.id);
                 setQuery("");
                 inputRef.current?.focus();
               }}
-              className="border border-white/20 hover:border-white px-2 py-2 text-sm font-mono text-left transition-colors"
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                bgcolor: "background.default",
+                color: "text.primary",
+                cursor: "pointer",
+                px: 1,
+                py: 1,
+                textAlign: "left",
+                transition: "border-color .15s",
+                "&:hover": { borderColor: "text.primary" },
+              }}
             >
-              <span>{c.name}</span>
+              <Typography component="span" variant="body2">
+                {c.name}
+              </Typography>
               {c.tuning === "drop-d" && (
-                <span className="ml-1 text-[9px] text-white/40 uppercase">
+                <Typography
+                  component="span"
+                  sx={{
+                    ml: 0.5,
+                    fontSize: 9,
+                    textTransform: "uppercase",
+                    color: "text.secondary",
+                  }}
+                >
                   drop D
-                </span>
+                </Typography>
               )}
-            </button>
+            </Box>
           ))}
           {results.length === 0 && (
-            <p className="col-span-full text-center text-white/50 font-mono text-sm py-8">
+            <Typography
+              variant="body2"
+              sx={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                color: "text.secondary",
+                py: 4,
+              }}
+            >
               no chords match.
-            </p>
+            </Typography>
           )}
-        </div>
-        <p className="mt-3 text-[10px] font-mono uppercase tracking-wider text-white/40">
+        </Box>
+        <SectionLabel sx={{ mt: 1.5, display: "block" }}>
           tap a chord to add · esc to close
-        </p>
-      </div>
-    </div>
+        </SectionLabel>
+      </Box>
+    </Modal>
   );
 }

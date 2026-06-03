@@ -53,7 +53,7 @@ export default function ChordDiagram({
       viewBox="-12 0 122 120"
       width={size}
       height={size * (120 / 122)}
-      className="block"
+      style={{ display: "block" }}
       role="img"
     >
       {/* string labels: O for open, X for muted */}

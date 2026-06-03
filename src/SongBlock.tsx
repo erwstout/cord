@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import {
+  Box,
+  Stack,
+  Input,
+  Button,
+  IconButton,
+  Typography,
+  Panel,
+} from "@buschschwick/uac-ui";
 import { chords } from "./chords";
 import ChordDiagram from "./ChordDiagram";
 import { chordNameById, type DisplayMode, type SongBlock } from "./songs";
@@ -50,108 +59,155 @@ export default function SongBlockCard({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="border border-white/20 bg-black"
-    >
-      <div className="flex items-center gap-2 px-2 py-2 border-b border-white/10">
-        <button
+    <Panel ref={setNodeRef} style={style} padding={0}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        sx={{ px: 1, py: 1, borderBottom: 1, borderColor: "divider" }}
+      >
+        <Box
+          component="span"
           {...attributes}
           {...listeners}
           aria-label="Drag block"
           title="Drag to reorder"
-          className="px-2 py-1 text-white/40 hover:text-white touch-none cursor-grab active:cursor-grabbing font-mono"
+          sx={{
+            px: 1,
+            py: 0.5,
+            color: "text.secondary",
+            touchAction: "none",
+            cursor: "grab",
+            "&:active": { cursor: "grabbing" },
+          }}
         >
           ⋮⋮
-        </button>
-        <input
+        </Box>
+        <Input
           type="text"
           value={block.label}
           onChange={(e) => onChange({ ...block, label: e.target.value })}
           placeholder="Section name"
-          className="flex-1 bg-transparent border-0 px-2 py-1 text-sm font-mono outline-none focus:bg-white/5 placeholder:text-white/30"
+          variant="standard"
+          sx={{ flex: 1 }}
         />
-        <button
+        <Button
+          variant="outlined"
+          size="small"
           onClick={onDuplicate}
           aria-label="Duplicate block"
           title="Duplicate"
-          className="px-2 py-1 text-xs font-mono text-white/60 hover:text-white border border-white/20 hover:border-white"
         >
           dup
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
           onClick={onDelete}
           aria-label="Delete block"
           title="Delete"
-          className="px-2 py-1 text-xs font-mono text-white/60 hover:text-white border border-white/20 hover:border-white"
         >
           ×
-        </button>
-      </div>
+        </Button>
+      </Stack>
 
-      <div className="p-3">
+      <Box sx={{ p: 1.5 }}>
         {block.chordIds.length === 0 ? (
-          <p className="text-xs font-mono text-white/40">no chords yet.</p>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>
+            no chords yet.
+          </Typography>
         ) : display === "graphs" ? (
-          <div className="flex flex-wrap gap-3">
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5 }}>
             {block.chordIds.map((id, i) => {
               const chord = chords.find((c) => c.id === id);
               return (
-                <div
+                <Box
                   key={`${id}-${i}`}
-                  className="flex flex-col items-center gap-1 border border-white/15 p-2"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 0.5,
+                    border: 1,
+                    borderColor: "divider",
+                    p: 1,
+                  }}
                 >
                   {chord ? (
                     <ChordDiagram shape={chord.shape} size={96} showFingers={false} />
                   ) : (
-                    <div className="w-24 h-24 flex items-center justify-center text-white/40 font-mono text-xs">
+                    <Box
+                      sx={{
+                        width: 96,
+                        height: 96,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "text.secondary",
+                        fontSize: 12,
+                      }}
+                    >
                       ?
-                    </div>
+                    </Box>
                   )}
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-xs">
+                  <Stack direction="row" alignItems="center" spacing={0.75}>
+                    <Typography component="span" variant="caption">
                       {chord?.name ?? id}
-                    </span>
-                    <button
+                    </Typography>
+                    <IconButton
+                      size="small"
                       onClick={() => removeChordAt(i)}
                       aria-label={`Remove ${chord?.name ?? id}`}
-                      className="text-white/40 hover:text-white text-sm leading-none"
+                      sx={{ fontSize: 14, lineHeight: 1, color: "text.secondary" }}
                     >
                       ×
-                    </button>
-                  </div>
-                </div>
+                    </IconButton>
+                  </Stack>
+                </Box>
               );
             })}
-          </div>
+          </Box>
         ) : (
-          <div className="flex flex-wrap gap-1.5">
+          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
             {block.chordIds.map((id, i) => (
-              <span
+              <Box
                 key={`${id}-${i}`}
-                className="inline-flex items-center gap-1.5 border border-white/20 px-2 py-1 font-mono text-sm"
+                component="span"
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.75,
+                  border: 1,
+                  borderColor: "divider",
+                  px: 1,
+                  py: 0.5,
+                }}
               >
-                {chordNameById(id)}
-                <button
+                <Typography component="span" variant="body2">
+                  {chordNameById(id)}
+                </Typography>
+                <IconButton
+                  size="small"
                   onClick={() => removeChordAt(i)}
                   aria-label={`Remove ${chordNameById(id)}`}
-                  className="text-white/40 hover:text-white leading-none"
+                  sx={{ lineHeight: 1, color: "text.secondary" }}
                 >
                   ×
-                </button>
-              </span>
+                </IconButton>
+              </Box>
             ))}
-          </div>
+          </Box>
         )}
 
-        <button
+        <Button
+          variant="outlined"
+          size="small"
           onClick={() => setPickerOpen(true)}
-          className="mt-3 px-2.5 py-1 text-xs font-mono border border-white/30 hover:border-white text-white/70 hover:text-white"
+          sx={{ mt: 1.5 }}
         >
           + chord
-        </button>
-      </div>
+        </Button>
+      </Box>
 
       {pickerOpen && (
         <ChordPicker
@@ -159,6 +215,6 @@ export default function SongBlockCard({
           onClose={() => setPickerOpen(false)}
         />
       )}
-    </div>
+    </Panel>
   );
 }

@@ -1,4 +1,19 @@
 import { useMemo, useState } from "react";
+import {
+  Box,
+  Stack,
+  Tabs,
+  Tab,
+  Input,
+  Button,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  SectionLabel,
+  Modal,
+  Divider,
+} from "@buschschwick/uac-ui";
 import { chords, tuningLabels, type Chord } from "./chords";
 import ChordDiagram from "./ChordDiagram";
 import Songs from "./Songs";
@@ -14,6 +29,8 @@ const categories: Chord["category"][] = [
 ];
 
 type Tab = "chords" | "songs" | "progressions";
+
+const SHELL_SX = { width: "100%", maxWidth: 1024, mx: "auto", px: 3 } as const;
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("chords");
@@ -45,162 +62,181 @@ export default function App() {
     : null;
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <header className="border-b border-white/15">
-        <div className="mx-auto max-w-5xl px-6 py-6 flex items-baseline justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight font-mono">
-            cord
-          </h1>
-          <p className="text-xs text-white/50 font-mono">guitar chords</p>
-        </div>
-        <nav
-          aria-label="Sections"
-          className="mx-auto max-w-5xl px-6 -mb-px flex gap-1"
-        >
-          {(["chords", "songs", "progressions"] as const).map((t) => {
-            const active = tab === t;
-            return (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                aria-pressed={active}
-                className={
-                  "px-3 py-2 text-xs font-mono uppercase tracking-wider border-b-2 " +
-                  (active
-                    ? "border-white text-white"
-                    : "border-transparent text-white/50 hover:text-white")
-                }
-              >
-                {t}
-              </button>
-            );
-          })}
-        </nav>
-      </header>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", color: "text.primary" }}>
+      <Box component="header" sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ ...SHELL_SX, py: 3, display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <Typography variant="h1">cord</Typography>
+          <SectionLabel>guitar chords</SectionLabel>
+        </Box>
+        <Box sx={{ ...SHELL_SX }}>
+          <Tabs
+            value={tab}
+            onChange={(_, v: Tab) => setTab(v)}
+            aria-label="Sections"
+          >
+            <Tab value="chords" label="chords" />
+            <Tab value="songs" label="songs" />
+            <Tab value="progressions" label="progressions" />
+          </Tabs>
+        </Box>
+      </Box>
 
-      <main className="mx-auto max-w-5xl px-6 py-8">
+      <Box component="main" sx={{ ...SHELL_SX, py: 4 }}>
         {tab === "songs" ? (
           <Songs />
         ) : tab === "progressions" ? (
           <Progressions />
         ) : (
-        <>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="search chords…"
-            className="w-full sm:max-w-sm bg-black border border-white/30 focus:border-white px-3 py-2 text-sm font-mono outline-none placeholder:text-white/40"
-          />
-          <div className="flex flex-wrap items-center gap-1.5">
-            {(["All", ...categories] as const).map((c) => {
-              const active = activeCategory === c;
-              return (
-                <button
-                  key={c}
-                  onClick={() => setActiveCategory(c)}
-                  className={
-                    "px-2.5 py-1 text-xs font-mono border " +
-                    (active
-                      ? "bg-white text-black border-white"
-                      : "border-white/30 text-white/70 hover:border-white hover:text-white")
-                  }
+          <>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              sx={{ alignItems: { sm: "center" }, justifyContent: "space-between" }}
+            >
+              <Input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="search chords…"
+                sx={{ width: "100%", maxWidth: { sm: 384 } }}
+              />
+              <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap alignItems="center">
+                <ToggleButtonGroup
+                  exclusive
+                  value={activeCategory}
+                  onChange={(_, v) => v && setActiveCategory(v)}
+                  sx={{ flexWrap: "wrap", gap: 0.75 }}
                 >
-                  {c}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setIncludeDropD((v) => !v)}
-              aria-pressed={includeDropD}
-              title="Include drop D tuning chords (D A D G B e)"
-              className={
-                "px-2.5 py-1 text-xs font-mono border ml-1 " +
-                (includeDropD
-                  ? "bg-white text-black border-white"
-                  : "border-white/30 text-white/70 hover:border-white hover:text-white")
-              }
-            >
-              Drop D
-            </button>
-          </div>
-        </div>
-
-        <section className="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {filtered.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setSelectedId(c.id)}
-              className="group relative border border-white/20 hover:border-white p-3 flex flex-col items-center gap-2 transition-colors"
-            >
-              {c.tuning === "drop-d" && (
-                <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-wider border border-white/40 text-white/70">
+                  {(["All", ...categories] as const).map((c) => (
+                    <ToggleButton key={c} value={c}>
+                      {c}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+                <ToggleButton
+                  value="drop-d"
+                  selected={includeDropD}
+                  onChange={() => setIncludeDropD((v) => !v)}
+                  title="Include drop D tuning chords (D A D G B e)"
+                  sx={{ ml: 0.5 }}
+                >
                   Drop D
-                </span>
-              )}
-              <ChordDiagram shape={c.shape} size={120} showFingers={false} />
-              <div className="flex w-full items-baseline justify-between">
-                <span className="font-mono text-sm">{c.name}</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-white/40">
-                  {c.category}
-                </span>
-              </div>
-            </button>
-          ))}
-          {filtered.length === 0 && (
-            <p className="col-span-full text-center text-white/50 font-mono text-sm py-12">
-              no chords match.
-            </p>
-          )}
-        </section>
-        </>
-        )}
-      </main>
+                </ToggleButton>
+              </Stack>
+            </Stack>
 
-      {selected && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center p-6 z-50"
-          onClick={() => setSelectedId(null)}
-        >
-          <div
-            className="border border-white/30 bg-black p-6 sm:p-8 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-baseline justify-between mb-6">
-              <div>
-                <h2 className="text-3xl font-mono">{selected.name}</h2>
-                <p className="text-xs font-mono text-white/50 uppercase tracking-wider mt-1">
-                  {selected.category}
-                  {selected.tuning === "drop-d" && (
-                    <span className="ml-2 text-white/70">· Drop D</span>
+            <Box
+              component="section"
+              sx={{
+                mt: 4,
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(2, 1fr)",
+                  sm: "repeat(3, 1fr)",
+                  md: "repeat(4, 1fr)",
+                  lg: "repeat(5, 1fr)",
+                },
+                gap: 1.5,
+              }}
+            >
+              {filtered.map((c) => (
+                <Box
+                  key={c.id}
+                  component="button"
+                  onClick={() => setSelectedId(c.id)}
+                  sx={{
+                    position: "relative",
+                    border: 1,
+                    borderColor: "divider",
+                    bgcolor: "background.default",
+                    color: "text.primary",
+                    cursor: "pointer",
+                    p: 1.5,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 1,
+                    transition: "border-color .15s",
+                    "&:hover": { borderColor: "text.primary" },
+                  }}
+                >
+                  {c.tuning === "drop-d" && (
+                    <Box
+                      component="span"
+                      sx={{
+                        position: "absolute",
+                        top: 6,
+                        right: 6,
+                        px: 0.75,
+                        py: 0.25,
+                        fontSize: 9,
+                        fontFamily: "monospace",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        border: 1,
+                        borderColor: "text.secondary",
+                        color: "text.secondary",
+                      }}
+                    >
+                      Drop D
+                    </Box>
                   )}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedId(null)}
-                aria-label="Close"
-                className="font-mono text-white/60 hover:text-white text-2xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="flex justify-center">
-              <ChordDiagram shape={selected.shape} size={280} />
-            </div>
-
-            <div className="mt-6 flex justify-between gap-2 text-xs font-mono text-white/60">
-              {tuningLabels[selected.tuning ?? "standard"].map((label, i) => (
-                <span key={i}>{label}</span>
+                  <ChordDiagram shape={c.shape} size={120} showFingers={false} />
+                  <Box sx={{ display: "flex", width: "100%", alignItems: "baseline", justifyContent: "space-between" }}>
+                    <Typography component="span" variant="body2">{c.name}</Typography>
+                    <Typography
+                      component="span"
+                      sx={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}
+                    >
+                      {c.category}
+                    </Typography>
+                  </Box>
+                </Box>
               ))}
-            </div>
+              {filtered.length === 0 && (
+                <Typography
+                  sx={{ gridColumn: "1 / -1", textAlign: "center", color: "text.secondary", py: 6 }}
+                  variant="body2"
+                >
+                  no chords match.
+                </Typography>
+              )}
+            </Box>
+          </>
+        )}
+      </Box>
+
+      <Modal open={selected != null} onClose={() => setSelectedId(null)} maxWidth="xs" fullWidth>
+        {selected && (
+          <Box>
+            <Box sx={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", mb: 3 }}>
+              <Box>
+                <Typography sx={{ fontSize: 30, fontFamily: "monospace" }}>{selected.name}</Typography>
+                <SectionLabel sx={{ mt: 0.5 }}>
+                  {selected.category}
+                  {selected.tuning === "drop-d" && " · Drop D"}
+                </SectionLabel>
+              </Box>
+              <IconButton aria-label="Close" onClick={() => setSelectedId(null)} sx={{ fontSize: 24, lineHeight: 1 }}>
+                ×
+              </IconButton>
+            </Box>
+
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <ChordDiagram shape={selected.shape} size={280} />
+            </Box>
+
+            <Stack direction="row" justifyContent="space-between" sx={{ mt: 3, color: "text.secondary" }}>
+              {tuningLabels[selected.tuning ?? "standard"].map((label, i) => (
+                <Typography key={i} component="span" variant="caption">{label}</Typography>
+              ))}
+            </Stack>
             {selected.tuning === "drop-d" && (
-              <p className="mt-3 text-center text-[10px] font-mono uppercase tracking-wider text-white/40">
+              <Typography
+                sx={{ mt: 1.5, textAlign: "center", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.05em", color: "text.secondary" }}
+              >
                 tuning: D A D G B e
-              </p>
+              </Typography>
             )}
 
             {(() => {
@@ -209,42 +245,35 @@ export default function App() {
                 .filter((c): c is Chord => Boolean(c));
               if (suggestions.length === 0) return null;
               return (
-                <div className="mt-8 pt-6 border-t border-white/15">
-                  <p className="text-[10px] font-mono uppercase tracking-wider text-white/40 mb-3">
-                    next
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
+                <Box sx={{ mt: 4, pt: 3 }}>
+                  <Divider sx={{ mb: 3 }} />
+                  <SectionLabel sx={{ mb: 1.5, display: "block" }}>next</SectionLabel>
+                  <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
                     {suggestions.map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => setSelectedId(s.id)}
-                        className="px-2.5 py-1 text-xs font-mono border border-white/20 hover:border-white text-white/80 hover:text-white transition-colors"
-                      >
+                      <Button key={s.id} variant="outlined" onClick={() => setSelectedId(s.id)}>
                         {s.name}
-                        {s.tuning === "drop-d" && (
-                          <span className="ml-1.5 text-white/40">· Drop D</span>
-                        )}
-                      </button>
+                        {s.tuning === "drop-d" && " · Drop D"}
+                      </Button>
                     ))}
-                  </div>
-                </div>
+                  </Stack>
+                </Box>
               );
             })()}
-          </div>
-        </div>
-      )}
+          </Box>
+        )}
+      </Modal>
 
-      <footer className="mx-auto max-w-5xl px-6 py-10 text-center text-xs font-mono text-white/40">
+      <Box component="footer" sx={{ ...SHELL_SX, py: 5, textAlign: "center", color: "text.secondary" }}>
         {tab === "chords" ? (
-          <p>
+          <Typography variant="caption">
             {chords.filter((c) => includeDropD || c.tuning !== "drop-d").length}{" "}
             chords · open and barre shapes
             {includeDropD ? " · drop D included" : ""}
-          </p>
+          </Typography>
         ) : (
-          <p>local-only · import / export JSON to save your work</p>
+          <Typography variant="caption">local-only · import / export JSON to save your work</Typography>
         )}
-      </footer>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -1,7 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
+/*
+ * Global base. Background, text color, and base typography come from uac-ui's
+ * theme (MUI CssBaseline); this file only owns the full-height layout root.
+ */
 html,
 body,
 #root {
@@ -10,10 +10,4 @@ body,
 
 body {
   margin: 0;
-  background-color: #000;
-  color: #fff;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }

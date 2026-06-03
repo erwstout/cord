@@ -15,6 +15,15 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import {
+  Box,
+  Stack,
+  Input,
+  Button,
+  Typography,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@buschschwick/uac-ui";
 import SongBlockCard from "./SongBlock";
 import {
   emptySong,
@@ -125,78 +134,63 @@ export default function Songs() {
   };
 
   return (
-    <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <input
+    <Box>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={1.5}
+        sx={{ alignItems: { sm: "center" }, justifyContent: "space-between" }}
+      >
+        <Input
           type="text"
           value={song.title}
           onChange={(e) => setSong({ ...song, title: e.target.value })}
           placeholder="Song title"
-          className="w-full sm:max-w-sm bg-black border border-white/30 focus:border-white px-3 py-2 text-sm font-mono outline-none placeholder:text-white/40"
+          sx={{ width: "100%", maxWidth: { sm: 384 } }}
         />
-        <div className="flex flex-wrap items-center gap-1.5">
-          <div
-            role="group"
+        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap alignItems="center">
+          <ToggleButtonGroup
+            exclusive
+            value={display}
+            onChange={(_, v: DisplayMode | null) => v && setDisplay(v)}
             aria-label="Display mode"
-            className="flex border border-white/30"
           >
-            <button
-              onClick={() => setDisplay("names")}
-              aria-pressed={display === "names"}
-              className={
-                "px-2.5 py-1 text-xs font-mono " +
-                (display === "names"
-                  ? "bg-white text-black"
-                  : "text-white/70 hover:text-white")
-              }
-            >
-              names
-            </button>
-            <button
-              onClick={() => setDisplay("graphs")}
-              aria-pressed={display === "graphs"}
-              className={
-                "px-2.5 py-1 text-xs font-mono border-l border-white/30 " +
-                (display === "graphs"
-                  ? "bg-white text-black"
-                  : "text-white/70 hover:text-white")
-              }
-            >
-              graphs
-            </button>
-          </div>
-          <button
-            onClick={onImportClick}
-            className="px-2.5 py-1 text-xs font-mono border border-white/30 hover:border-white text-white/70 hover:text-white"
-          >
+            <ToggleButton value="names">names</ToggleButton>
+            <ToggleButton value="graphs">graphs</ToggleButton>
+          </ToggleButtonGroup>
+          <Button variant="outlined" size="small" onClick={onImportClick}>
             import
-          </button>
-          <button
-            onClick={() => exportSong(song)}
-            className="px-2.5 py-1 text-xs font-mono border border-white/30 hover:border-white text-white/70 hover:text-white"
-          >
+          </Button>
+          <Button variant="outlined" size="small" onClick={() => exportSong(song)}>
             export
-          </button>
-          <button
-            onClick={resetSong}
-            className="px-2.5 py-1 text-xs font-mono border border-white/30 hover:border-white text-white/70 hover:text-white"
-          >
+          </Button>
+          <Button variant="outlined" size="small" onClick={resetSong}>
             new
-          </button>
+          </Button>
           <input
             ref={fileInputRef}
             type="file"
             accept="application/json,.json"
-            className="hidden"
+            style={{ display: "none" }}
             onChange={onFileChosen}
           />
-        </div>
-      </div>
+        </Stack>
+      </Stack>
 
       {importError && (
-        <p className="mt-3 text-xs font-mono text-red-300 border border-red-300/40 px-3 py-2">
+        <Typography
+          variant="caption"
+          sx={{
+            display: "block",
+            mt: 1.5,
+            color: "error.main",
+            border: 1,
+            borderColor: "error.main",
+            px: 1.5,
+            py: 1,
+          }}
+        >
           {importError}
-        </p>
+        </Typography>
       )}
 
       <DndContext
@@ -208,7 +202,14 @@ export default function Songs() {
           items={song.blocks.map((b) => b.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Box
+            sx={{
+              mt: 3,
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, 1fr)" },
+              gap: 1.5,
+            }}
+          >
             {song.blocks.map((b) => (
               <SongBlockCard
                 key={b.id}
@@ -219,22 +220,22 @@ export default function Songs() {
                 onDelete={() => deleteBlock(b.id)}
               />
             ))}
-          </div>
+          </Box>
         </SortableContext>
       </DndContext>
 
-      <button
-        onClick={addBlock}
-        className="mt-4 px-3 py-2 text-sm font-mono border border-white/30 hover:border-white text-white/80 hover:text-white"
-      >
+      <Button variant="outlined" onClick={addBlock} sx={{ mt: 2 }}>
         + block
-      </button>
+      </Button>
 
       {song.blocks.length === 0 && (
-        <p className="mt-6 text-center text-white/50 font-mono text-sm py-8">
+        <Typography
+          variant="body2"
+          sx={{ mt: 3, textAlign: "center", color: "text.secondary", py: 4 }}
+        >
           no blocks. add one to get started.
-        </p>
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }
