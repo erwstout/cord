@@ -15,6 +15,7 @@ import {
   Divider,
 } from "@buschschwick/uac-ui";
 import { chords, tuningLabels, type Chord } from "./chords";
+import { getVariations } from "./chordVariations";
 import ChordDiagram from "./ChordDiagram";
 import Songs from "./Songs";
 import Progressions from "./Progressions";
@@ -60,6 +61,11 @@ export default function App() {
   const selected = selectedId
     ? chords.find((c) => c.id === selectedId) ?? null
     : null;
+
+  const variations = useMemo(
+    () => (selected ? getVariations(selected) : []),
+    [selected]
+  );
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default", color: "text.primary" }}>
@@ -237,6 +243,29 @@ export default function App() {
               >
                 tuning: D A D G B e
               </Typography>
+            )}
+
+            {variations.length > 0 && (
+              <Box sx={{ mt: 4, pt: 3 }}>
+                <Divider sx={{ mb: 3 }} />
+                <SectionLabel sx={{ mb: 1.5, display: "block" }}>variations</SectionLabel>
+                <Box sx={{ display: "flex", gap: 2, overflowX: "auto", pb: 1 }}>
+                  {variations.map((v, i) => (
+                    <Box
+                      key={i}
+                      sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.75, flexShrink: 0 }}
+                    >
+                      <ChordDiagram shape={v.shape} size={140} showFingers={false} />
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "text.secondary", textAlign: "center", fontSize: 10 }}
+                      >
+                        {v.label}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
             )}
 
             {(() => {
